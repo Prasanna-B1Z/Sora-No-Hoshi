@@ -1,0 +1,81 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper functions ─────────────────────────────────
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isAdmin() {
+      return isSignedIn() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+    function isNotRemoved() {
+      return isSignedIn() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.removed != true;
+    }
+
+    // ── Users collection ─────────────────────────────────
+    match /users/{uid} {
+      // Users can ALWAYS read their own doc (needed right after signup)
+      // Other signed-in (non-removed) members can read other profiles
+      allow read: if isOwner(uid) || isNotRemoved();
+
+      // Only the user themselves can create their own doc (on signup)
+      allow create: if isOwner(uid);
+
+      // User can update their own profile; admin can update any user
+      allow update: if isOwner(uid) || isAdmin();
+
+      // Only admin can delete user docs
+      allow delete: if isAdmin();
+    }
+
+    // ── Messages collection ──────────────────────────────
+    match /messages/{msgId} {
+      // Any active (non-removed) member can read messages
+      allow read: if isNotRemoved();
+
+      // Any active member can create a message
+      allow create: if isNotRemoved();
+
+      // User can update their own message; admin can update any message
+      // (for reactions, read receipts, and delete flags)
+      allow update: if isNotRemoved() && (
+        resource.data.senderId == request.auth.uid || isAdmin()
+      );
+
+      // Only admins can hard-delete messages
+      allow delete: if isAdmin();
+    }
+
+    // ── Typing collection ────────────────────────────────
+    match /typing/{uid} {
+      // Any active member can read typing status
+      allow read: if isNotRemoved();
+
+      // Users can only write their own typing status
+      allow write: if isOwner(uid) && isNotRemoved();
+    }
+
+    // ── Media views collection ───────────────────────────
+    match /mediaViews/{mediaId} {
+      // Any active member can read (to check view count)
+      allow read: if isNotRemoved();
+
+      // Uploader creates the doc
+      allow create: if isNotRemoved();
+
+      // Any member can update (to increment their view count)
+      allow update: if isNotRemoved();
+
+      // Only admin or uploader can delete
+      allow delete: if isAdmin() ||
+        (isNotRemoved() && resource.data.uploadedBy == request.auth.uid);
+    }
+  }
+}

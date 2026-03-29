@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SORA NO HOSHI ✦ Star in the Sky</title>
+    <meta name="description" content="SORA NO HOSHI — a premium private group chat with space-star aesthetics." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✦</text></svg>" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+    <!-- ░░ STAR CANVAS (background) ░░ -->
+    <canvas id="star-canvas"></canvas>
+
+    <!-- ═══════════════════════════════════
+     AUTH VIEW
+════════════════════════════════════ -->
+    <div id="auth-view" class="view">
+        <div class="auth-wrap">
+            <div class="auth-brand">
+                <div class="auth-logo">✦</div>
+                <h1>SORA NO HOSHI</h1>
+                <p class="auth-tagline">星の空 · Star in the Sky</p>
+            </div>
+            <div class="auth-card glass">
+                <!-- Tabs -->
+                <div class="auth-tabs">
+                    <button id="tab-signin" class="auth-tab active" onclick="authSwitchTab('signin')">Sign In</button>
+                    <button id="tab-signup" class="auth-tab" onclick="authSwitchTab('signup')">Sign Up</button>
+                </div>
+
+                <!-- Sign In -->
+                <form id="signin-form" class="auth-form">
+                    <div class="field-group">
+                        <label>Email</label>
+                        <input id="si-email" type="email" placeholder="your@gmail.com" autocomplete="email" required />
+                    </div>
+                    <div class="field-group">
+                        <label>Password</label>
+                        <input id="si-password" type="password" placeholder="••••••••" autocomplete="current-password"
+                            required />
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full" id="btn-signin">Sign In</button>
+                    <div id="signin-error" class="auth-error hidden"></div>
+                </form>
+
+                <!-- Sign Up -->
+                <form id="signup-form" class="auth-form hidden">
+                    <div class="field-group">
+                        <label>Display Name</label>
+                        <input id="su-name" type="text" placeholder="Your name" required />
+                    </div>
+                    <div class="field-group">
+                        <label>Email</label>
+                        <input id="su-email" type="email" placeholder="your@gmail.com" required />
+                    </div>
+                    <div class="field-group">
+                        <label>Password</label>
+                        <input id="su-password" type="password" placeholder="Min. 6 characters" autocomplete="new-password" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full" id="btn-signup">Create Account</button>
+                    <div id="signup-error" class="auth-error hidden"></div>
+                </form>
+            </div>
+
+            <!-- Admin login hint -->
+            <div class="auth-admin-hint">
+                <button class="btn-ghost" id="btn-admin-hint">⚙ Admin access</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════
+     REMOVED SCREEN
+════════════════════════════════════ -->
+    <div id="removed-screen" class="view hidden">
+        <div class="removed-card glass">
+            <div class="removed-icon">🚫</div>
+            <h2>Access Revoked</h2>
+            <p>You have been removed from SORA NO HOSHI by an admin.</p>
+            <button class="btn btn-primary" onclick="location.reload()">Back to Login</button>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════
+     APP VIEW
+════════════════════════════════════ -->
+    <div id="app-view" class="view hidden">
+
+        <!-- ══ Left Navigation Rail ══ -->
+        <nav id="app-nav" class="app-nav glass">
+            <div class="app-nav-brand">✦</div>
+
+            <div class="app-nav-links">
+                <button class="app-nav-btn active" id="nav-btn-home"  onclick="switchPanel('home')"  title="Home">🏠<span>Home</span></button>
+                <button class="app-nav-btn"        id="nav-btn-chat"  onclick="switchPanel('chat')"  title="Chat">💬<span>Chat</span></button>
+                <button class="app-nav-btn"        id="nav-btn-chess" onclick="switchPanel('chess')" title="Chess">♟<span>Chess</span></button>
+            </div>
+
+            <!-- My profile row -->
+            <div class="nav-profile-row" id="my-profile-row">
+                <div id="my-avatar-sidebar" class="avatar xs"></div>
+                <div class="nav-profile-info">
+                    <span id="my-name-sidebar" class="nav-profile-name">…</span>
+                    <span id="my-role-badge" class="role-badge member">member</span>
+                </div>
+                <button class="icon-btn" id="btn-open-profile" title="Edit profile">✏</button>
+            </div>
+
+            <div class="app-nav-bottom">
+                <button class="app-nav-btn" id="btn-admin-panel" style="display:none" onclick="openModal('admin-modal')" title="Admin Panel">👑<span>Admin</span></button>
+                <button class="app-nav-btn" id="btn-settings" onclick="openModal('settings-modal')" title="Settings">⚙<span>Settings</span></button>
+                <button class="app-nav-btn danger-nav" id="btn-logout" title="Sign Out">⏻<span>Sign Out</span></button>
+            </div>
+        </nav>
+
+        <!-- ══ Main Content Area ══ -->
+        <main id="main-content" class="main-content">
+
+            <!-- ── HOME PANEL ── -->
+            <div id="home-panel" class="app-panel">
+                <div class="home-hero">
+                    <div class="home-star">✦</div>
+                    <h1 id="home-greeting" class="home-title">Welcome back</h1>
+                    <p class="home-sub">星の空 · SORA NO HOSHI</p>
+                </div>
+
+                <div class="home-stats">
+                    <div class="home-stat glass">
+                        <span class="home-stat-num" id="stat-members">0</span>
+                        <span class="home-stat-lbl">Members</span>
+                    </div>
+                    <div class="home-stat glass">
+                        <span class="home-stat-num" id="stat-online">0</span>
+                        <span class="home-stat-lbl">Online</span>
+                    </div>
+                </div>
+
+                <div class="home-actions">
+                    <button class="home-action glass" onclick="switchPanel('chat')">
+                        <span class="home-action-icon">💬</span>
+                        <span class="home-action-name">Group Chat</span>
+                        <span class="home-action-desc">Message everyone</span>
+                    </button>
+                    <button class="home-action glass" onclick="switchPanel('chess')">
+                        <span class="home-action-icon">♟</span>
+                        <span class="home-action-name">Chess</span>
+                        <span class="home-action-desc">Local 2-player match</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ── CHAT PANEL ── -->
+            <div id="chat-panel" class="app-panel hidden">
+                <header class="chat-header glass">
+                    <div class="chat-header-info">
+                        <span class="chat-header-title">✦ SORA NO HOSHI</span>
+                        <span class="chat-header-sub" id="header-members-count">Loading…</span>
+                    </div>
+                </header>
+
+                <div id="messages-container" class="messages-container">
+                    <div id="messages-list" class="messages-list"></div>
+                    <div id="typing-bar" class="typing-bar hidden"></div>
+                </div>
+
+                <div class="compose-bar glass">
+                    <div id="reply-preview" class="reply-preview hidden">
+                        <div class="reply-preview-inner">
+                            <span class="reply-label">↩ Replying to </span>
+                            <span id="reply-preview-sender" class="reply-sender"></span>
+                            <span id="reply-preview-text"   class="reply-text"></span>
+                        </div>
+                        <button class="icon-btn" onclick="clearReply()">✕</button>
+                    </div>
+                    <div id="media-compose-preview" class="media-compose-preview hidden">
+                        <span id="media-compose-filename"></span>
+                        <select id="media-view-mode" class="select-small">
+                            <option value="direct">📎 Direct</option>
+                            <option value="once">👁 1-time view</option>
+                            <option value="twice">👁 2-time view</option>
+                        </select>
+                        <button class="icon-btn" onclick="clearMediaCompose()">✕</button>
+                    </div>
+                    <div class="compose-input-row">
+                        <button class="icon-btn" id="btn-attach" title="Attach media" onclick="document.getElementById('media-file-input').click()">📎</button>
+                        <input id="media-file-input" type="file" accept="image/*,video/*" style="display:none" />
+                        <textarea id="msg-input" class="msg-input" placeholder=" Type a message…" rows="1"></textarea>
+                        <button class="btn btn-primary icon-btn send-btn" id="btn-send" title="Send">▶</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── CHESS PANEL ── -->
+            <div id="chess-panel" class="app-panel hidden">
+                <div class="chess-setup" id="chess-setup">
+                    <h2 class="chess-setup-title">♟ SORA NO HOSHI — Chess</h2>
+                    <div class="chess-setup-row">
+                        <label>White (Player 1)</label>
+                        <input id="chess-p1-input" type="text" class="chess-name-input" placeholder="Player 1 name" />
+                    </div>
+                    <div class="chess-setup-row">
+                        <label>Black (Player 2)</label>
+                        <input id="chess-p2-input" type="text" class="chess-name-input" placeholder="Player 2 name" />
+                    </div>
+                    <button class="btn btn-primary" onclick="startChess()">Start Game</button>
+                </div>
+                <div id="chess-container" class="chess-container" style="display:none"></div>
+            </div>
+
+        </main>
+
+        <!-- ══ Right Members Panel ══ -->
+        <aside id="members-panel" class="members-panel glass">
+            <div class="members-panel-hdr">
+                <span class="members-panel-title">Members</span>
+                <span class="members-count-badge" id="members-count-badge">0</span>
+            </div>
+            <div class="members-online-hdr">🟢 Online</div>
+            <div id="members-list-online"  class="members-right-list"></div>
+            <div class="members-online-hdr members-offline-hdr">⚫ Offline</div>
+            <div id="members-list-offline" class="members-right-list"></div>
+        </aside>
+
+    </div>
+
+    <!-- ═══════════════════════════════════
+     MODALS
+════════════════════════════════════ -->
+
+    <!-- Profile Modal -->
+    <div id="profile-modal" class="modal-overlay hidden">
+        <div class="modal glass">
+            <div class="modal-header">
+                <h2 id="profile-modal-title">My Profile</h2>
+                <button class="icon-btn" onclick="closeModal('profile-modal')">✕</button>
+            </div>
+            <div class="modal-body" id="profile-modal-body">
+                <!-- Populated by profile.js -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal-overlay hidden">
+        <div class="modal glass">
+            <div class="modal-header">
+                <h2>⚙ Settings</h2>
+                <button class="icon-btn" onclick="closeModal('settings-modal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-label">Read Receipts</div>
+                        <div class="setting-desc">Show others when you've read messages</div>
+                    </div>
+                    <label class="toggle">
+                        <input type="checkbox" id="toggle-read-receipts" />
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-label">Typing Indicator</div>
+                        <div class="setting-desc">Show others when you're typing</div>
+                    </div>
+                    <label class="toggle">
+                        <input type="checkbox" id="toggle-typing" />
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <button class="btn btn-primary mt-12" id="btn-save-settings">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel Modal -->
+    <div id="admin-modal" class="modal-overlay hidden">
+        <div class="modal glass wide">
+            <div class="modal-header">
+                <h2>👑 Admin Panel</h2>
+                <button class="icon-btn" onclick="closeModal('admin-modal')">✕</button>
+            </div>
+            <div class="modal-body" id="admin-modal-body">
+                <!-- Populated by admin.js -->
+            </div>
+        </div>
+    </div>
+
+    <!-- View Profile Modal (other users) -->
+    <div id="view-profile-modal" class="modal-overlay hidden">
+        <div class="modal glass">
+            <div class="modal-header">
+                <h2>Profile</h2>
+                <button class="icon-btn" onclick="closeModal('view-profile-modal')">✕</button>
+            </div>
+            <div class="modal-body" id="view-profile-body">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════
+     MEDIA VIEWER OVERLAY
+════════════════════════════════════ -->
+    <div id="media-viewer" class="media-viewer-overlay hidden">
+        <div class="media-viewer-ui">
+            <span id="media-viewer-label" class="media-viewer-label"></span>
+            <button class="icon-btn media-close-btn" onclick="closeMediaViewer()">✕</button>
+        </div>
+        <div id="media-viewer-inner" class="media-viewer-inner" ondragstart="return false"></div>
+    </div>
+
+    <!-- ═══════════════════════════════════
+     TOAST CONTAINER
+════════════════════════════════════ -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- ═══════════════════════════════════
+     SCRIPTS — plain globals (run immediately)
+════════════════════════════════════ -->
+    <script>
+        /* ── Auth tab switch ── */
+        function authSwitchTab(tab) {
+            var signin = document.getElementById('signin-form');
+            var signup = document.getElementById('signup-form');
+            document.getElementById('tab-signin').classList.toggle('active', tab === 'signin');
+            document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+            signin.classList.toggle('hidden', tab !== 'signin');
+            signup.classList.toggle('hidden', tab !== 'signup');
+        }
+        /* ── Panel switching ── */
+        function switchPanel(panel) {
+            ['home','chat','chess'].forEach(function(p) {
+                document.getElementById(p + '-panel').classList.toggle('hidden', p !== panel);
+                var btn = document.getElementById('nav-btn-' + p);
+                if (btn) btn.classList.toggle('active', p === panel);
+            });
+        }
+        /* ── Chess start ── */
+        function startChess() {
+            var p1 = document.getElementById('chess-p1-input').value.trim() || 'White';
+            var p2 = document.getElementById('chess-p2-input').value.trim() || 'Black';
+            document.getElementById('chess-setup').style.display = 'none';
+            document.getElementById('chess-container').style.display = 'block';
+            if (window._initChess) window._initChess('chess-container', p1, p2);
+        }
+    </script>
+
+    <!-- ═══════════════════════════════════
+     SCRIPTS — ES module
+════════════════════════════════════ -->
+    <script type="module">
+        import { initAuth, signUp, signIn, logout, getCurrentUser, getCurrentUserData, refreshUserData } from './auth.js';
+        import { openModal, closeModal, showToast, makeAvatarEl, escHtml, formatTime, formatDateLabel } from './ui.js';
+        import { uploadMedia, showMediaViewer, closeMediaViewer } from './media.js';
+        import { initChat, sendMessage, sendMediaMessage, deleteMessage, reactToMessage, setReplyTarget } from './chat.js';
+
+        import { initTypingIndicator, setTyping, clearTyping } from './typingIndicator.js';
+        import { initProfile, renderMyProfile, renderViewProfile } from './profile.js';
+        import { initAdmin, renderAdminPanel } from './admin.js';
+        import { initMembers } from './members.js';
+        import { initChess } from './chess.js';
+
+        // ── Expose module-only functions globally ─────────────────
+        window.closeMediaViewer = closeMediaViewer;
+        window._setReplyTarget  = setReplyTarget;
+        window._initChess       = initChess;
+
+        // ── Enhanced Star Canvas: Nebula Dust · Stars · Sparkles · Shooting Stars ──
+        (function initStars() {
+            const canvas = document.getElementById('star-canvas');
+            const ctx    = canvas.getContext('2d');
+
+            // ── Colour palettes ────────────────────────────────────
+            const STAR_PALETTES = [
+                '180,195,255',   // cool blue-white
+                '220,210,255',   // soft violet-white
+                '255,240,210',   // warm gold-white
+                '160,230,255',   // ice-blue
+            ];
+            const SHOOT_PALETTES = [
+                { head:'255,255,255', tail:'160,190,255' },
+                { head:'255,220,255', tail:'200,120,255' },
+                { head:'200,240,255', tail:'80,200,255'  },
+                { head:'255,255,200', tail:'255,200,80'  },
+            ];
+
+            let stars = [], nebulae = [], shoots = [], sparkles = [];
+
+            // ── Resize + seed ──────────────────────────────────────
+            function resize() {
+                canvas.width  = window.innerWidth;
+                canvas.height = window.innerHeight;
+
+                // Nebula dust clouds (large blurry blobs drawn each frame)
+                nebulae = Array.from({ length: 6 }, () => ({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    rx: 180 + Math.random() * 220,
+                    ry: 120 + Math.random() * 160,
+                    a:  0.018 + Math.random() * 0.022,
+                    hue: Math.random() > 0.5
+                        ? `100,60,220`   // violet
+                        : `30,80,200`,  // deep blue
+                    vx: (Math.random() - 0.5) * 0.06,
+                    vy: (Math.random() - 0.5) * 0.04,
+                }));
+
+                // Layer 1 — distant tiny dim stars (150)
+                const layer1 = Array.from({ length: 150 }, () => ({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    r: Math.random() * 0.55 + 0.1,
+                    a: Math.random(),
+                    da: (Math.random() * 0.0012 + 0.0003) * (Math.random() > 0.5 ? 1 : -1),
+                    col: `rgba(${STAR_PALETTES[0]},`,
+                }));
+                // Layer 2 — mid stars (90)
+                const layer2 = Array.from({ length: 90 }, () => ({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    r: Math.random() * 0.9 + 0.35,
+                    a: Math.random(),
+                    da: (Math.random() * 0.002 + 0.0006) * (Math.random() > 0.5 ? 1 : -1),
+                    col: `rgba(${STAR_PALETTES[Math.floor(Math.random() * 2)]},`,
+                }));
+                // Layer 3 — close bright stars (40)
+                const layer3 = Array.from({ length: 40 }, () => ({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    r: Math.random() * 1.4 + 0.7,
+                    a: Math.random(),
+                    da: (Math.random() * 0.003 + 0.001) * (Math.random() > 0.5 ? 1 : -1),
+                    col: `rgba(${STAR_PALETTES[2 + Math.floor(Math.random() * 2)]},`,
+                    glow: true,
+                }));
+                // Layer 4 — hero sparkle stars (12)
+                sparkles = Array.from({ length: 12 }, () => ({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    r: Math.random() * 1.8 + 1.2,
+                    a: Math.random(),
+                    da: (Math.random() * 0.004 + 0.002) * (Math.random() > 0.5 ? 1 : -1),
+                    armLen: Math.random() * 10 + 6,
+                }));
+
+                stars = [...layer1, ...layer2, ...layer3];
+            }
+
+            // ── Spawn a shooting star ──────────────────────────────
+            function spawnShoot() {
+                const angle = (Math.random() * 35 + 8) * Math.PI / 180;
+                const speed = Math.random() * 9 + 7;
+                const pal   = SHOOT_PALETTES[Math.floor(Math.random() * SHOOT_PALETTES.length)];
+                shoots.push({
+                    x:    Math.random() * canvas.width * 0.85,
+                    y:    Math.random() * canvas.height * 0.45,
+                    vx:   Math.cos(angle) * speed,
+                    vy:   Math.sin(angle) * speed,
+                    len:  Math.random() * 220 + 100,
+                    w:    Math.random() * 2 + 0.8,
+                    a:    1,
+                    fade: Math.random() * 0.01 + 0.007,
+                    head: pal.head,
+                    tail: pal.tail,
+                });
+            }
+
+            spawnShoot();
+            setInterval(() => { if (shoots.length < 4) spawnShoot(); }, 1800);
+            window.addEventListener('resize', resize);
+            resize();
+
+            // ── Draw cross/sparkle for hero stars ─────────────────
+            function drawSparkle(x, y, r, armLen, a) {
+                ctx.save();
+                ctx.globalAlpha = a;
+                // Radial glow
+                const grd = ctx.createRadialGradient(x, y, 0, x, y, r * 4);
+                grd.addColorStop(0, `rgba(220,230,255,${a})`);
+                grd.addColorStop(1, `rgba(220,230,255,0)`);
+                ctx.fillStyle = grd;
+                ctx.beginPath();
+                ctx.arc(x, y, r * 4, 0, Math.PI * 2);
+                ctx.fill();
+                // Cross arms
+                const armAlpha = a * 0.7;
+                [0, Math.PI / 2].forEach(rot => {
+                    const arm = ctx.createLinearGradient(
+                        x - Math.cos(rot) * armLen, y - Math.sin(rot) * armLen,
+                        x + Math.cos(rot) * armLen, y + Math.sin(rot) * armLen
+                    );
+                    arm.addColorStop(0,   `rgba(255,255,255,0)`);
+                    arm.addColorStop(0.5, `rgba(255,255,255,${armAlpha})`);
+                    arm.addColorStop(1,   `rgba(255,255,255,0)`);
+                    ctx.strokeStyle = arm;
+                    ctx.lineWidth   = 0.9;
+                    ctx.beginPath();
+                    ctx.moveTo(x - Math.cos(rot) * armLen, y - Math.sin(rot) * armLen);
+                    ctx.lineTo(x + Math.cos(rot) * armLen, y + Math.sin(rot) * armLen);
+                    ctx.stroke();
+                });
+                ctx.restore();
+            }
+
+            // ── Main draw loop ─────────────────────────────────────
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // ① Nebula dust clouds
+                nebulae.forEach(n => {
+                    n.x = (n.x + n.vx + canvas.width)  % canvas.width;
+                    n.y = (n.y + n.vy + canvas.height) % canvas.height;
+                    ctx.save();
+                    ctx.globalAlpha = n.a;
+                    const g = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.rx);
+                    g.addColorStop(0,   `rgba(${n.hue},0.9)`);
+                    g.addColorStop(0.5, `rgba(${n.hue},0.3)`);
+                    g.addColorStop(1,   `rgba(${n.hue},0)`);
+                    ctx.scale(1, n.ry / n.rx);
+                    ctx.fillStyle = g;
+                    ctx.beginPath();
+                    ctx.arc(n.x, n.y * (n.rx / n.ry), n.rx, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                });
+
+                // ② Regular twinkling stars
+                stars.forEach(st => {
+                    st.a += st.da;
+                    if (st.a >= 1) { st.a = 1; st.da = -Math.abs(st.da); }
+                    if (st.a <= 0) { st.a = 0; st.da =  Math.abs(st.da); }
+                    ctx.beginPath();
+                    ctx.arc(st.x, st.y, st.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `${st.col}${st.a})`;
+                    ctx.fill();
+                    // Soft glow on brighter stars
+                    if (st.glow && st.a > 0.4) {
+                        const grd = ctx.createRadialGradient(st.x, st.y, 0, st.x, st.y, st.r * 5);
+                        grd.addColorStop(0, `${st.col}${st.a * 0.35})`);
+                        grd.addColorStop(1, `${st.col}0)`);
+                        ctx.fillStyle = grd;
+                        ctx.beginPath();
+                        ctx.arc(st.x, st.y, st.r * 5, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                });
+
+                // ③ Sparkle / hero stars
+                sparkles.forEach(sp => {
+                    sp.a += sp.da;
+                    if (sp.a >= 1) { sp.a = 1; sp.da = -Math.abs(sp.da); }
+                    if (sp.a <= 0) { sp.a = 0; sp.da =  Math.abs(sp.da); }
+                    drawSparkle(sp.x, sp.y, sp.r, sp.armLen, sp.a);
+                });
+
+                // ④ Shooting stars
+                shoots = shoots.filter(c => c.a > 0);
+                shoots.forEach(c => {
+                    const mag = Math.hypot(c.vx, c.vy);
+                    const nx  = c.vx / mag, ny = c.vy / mag;
+
+                    // Prismatic tail
+                    const tail = ctx.createLinearGradient(
+                        c.x, c.y,
+                        c.x - nx * c.len, c.y - ny * c.len
+                    );
+                    tail.addColorStop(0,    `rgba(${c.head},${c.a})`);
+                    tail.addColorStop(0.25, `rgba(${c.tail},${c.a * 0.7})`);
+                    tail.addColorStop(0.6,  `rgba(${c.tail},${c.a * 0.2})`);
+                    tail.addColorStop(1,    `rgba(${c.tail},0)`);
+                    ctx.beginPath();
+                    ctx.moveTo(c.x, c.y);
+                    ctx.lineTo(c.x - nx * c.len, c.y - ny * c.len);
+                    ctx.strokeStyle = tail;
+                    ctx.lineWidth   = c.w;
+                    ctx.lineCap     = 'round';
+                    ctx.stroke();
+
+                    // Outer glow halo on tail
+                    const halo = ctx.createLinearGradient(c.x, c.y, c.x - nx * c.len * 0.6, c.y - ny * c.len * 0.6);
+                    halo.addColorStop(0, `rgba(${c.tail},${c.a * 0.25})`);
+                    halo.addColorStop(1, `rgba(${c.tail},0)`);
+                    ctx.beginPath();
+                    ctx.moveTo(c.x, c.y);
+                    ctx.lineTo(c.x - nx * c.len * 0.6, c.y - ny * c.len * 0.6);
+                    ctx.strokeStyle = halo;
+                    ctx.lineWidth   = c.w * 4;
+                    ctx.stroke();
+
+                    // Bright head core
+                    const core = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, c.w * 5);
+                    core.addColorStop(0, `rgba(255,255,255,${c.a})`);
+                    core.addColorStop(0.4, `rgba(${c.head},${c.a * 0.8})`);
+                    core.addColorStop(1, `rgba(${c.tail},0)`);
+                    ctx.beginPath();
+                    ctx.arc(c.x, c.y, c.w * 5, 0, Math.PI * 2);
+                    ctx.fillStyle = core;
+                    ctx.fill();
+
+                    c.x += c.vx;
+                    c.y += c.vy;
+                    c.a -= c.fade;
+                    if (c.x > canvas.width + 150 || c.y > canvas.height + 150) c.a = 0;
+                });
+
+                requestAnimationFrame(draw);
+            }
+            draw();
+        })();
+
+        // authSwitchTab is defined in the plain script above
+
+        // ── Admin hint ────────────────────────────────────────────
+        document.getElementById('btn-admin-hint').addEventListener('click', () => {
+            showToast('Sign in with your admin account email and password.', 'info', 4000);
+            authSwitchTab('signin');
+        });
+
+        // ── Sign In form ──────────────────────────────────────────
+        document.getElementById('signin-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-signin');
+            const errEl = document.getElementById('signin-error');
+            errEl.classList.add('hidden');
+            btn.disabled = true; btn.textContent = 'Signing in…';
+            try {
+                await signIn(
+                    document.getElementById('si-email').value.trim(),
+                    document.getElementById('si-password').value
+                );
+            } catch (err) {
+                errEl.textContent = friendlyAuthError(err.message);
+                errEl.classList.remove('hidden');
+            } finally {
+                btn.disabled = false; btn.textContent = 'Sign In';
+            }
+        });
+
+        // ── Sign Up form ──────────────────────────────────────────
+        document.getElementById('signup-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-signup');
+            const errEl = document.getElementById('signup-error');
+            errEl.classList.add('hidden');
+            btn.disabled = true; btn.textContent = 'Creating account…';
+            try {
+                const email = document.getElementById('su-email').value.trim();
+                await signUp(
+                    email,
+                    document.getElementById('su-password').value,
+                    document.getElementById('su-name').value.trim()
+                );
+                // signUp auto-signs-in → onAuthStateChanged → home page
+                // Just clear the form; the auth observer handles navigation
+                document.getElementById('su-name').value = '';
+                document.getElementById('su-email').value = '';
+                document.getElementById('su-password').value = '';
+                showToast('Welcome to SORA NO HOSHI ✦', 'success', 4000);
+            } catch (err) {
+                console.error('[signup]', err);
+                errEl.textContent = friendlyAuthError(err.message);
+                errEl.classList.remove('hidden');
+            } finally {
+                btn.disabled = false; btn.textContent = 'Create Account';
+            }
+        });
+
+        function friendlyAuthError(msg) {
+            if (msg.includes('email-already')) return 'That email is already registered — try signing in instead.';
+            if (msg.includes('wrong-password') || msg.includes('invalid-credential') || msg.includes('INVALID_LOGIN_CREDENTIALS')) return 'Incorrect email or password. Check your details and try again.';
+            if (msg.includes('user-not-found')) return 'No account found with that email. Try signing up.';
+            if (msg.includes('weak-password')) return 'Password must be at least 6 characters.';
+            if (msg.includes('network-request-failed') || msg.includes('fetch')) return 'Network error — check your internet connection.';
+            if (msg.includes('too-many-requests')) return 'Too many failed attempts. Please wait a few minutes and try again.';
+            if (msg.includes('removed from this group')) return '🚫 Your account has been removed from SORA NO HOSHI.';
+            return 'Error: ' + msg;
+        }
+
+
+        // ── Logout ────────────────────────────────────────────────
+        document.getElementById('btn-logout').addEventListener('click', async () => {
+            await logout();
+        });
+
+        // ── Auth Observer ─────────────────────────────────────────
+        let chatUnsubscribe = null;
+        let membersUnsubscribe = null;
+        let typingUnsubscribe = null;
+
+        initAuth(
+            async (user, userData) => {
+                try {
+                    // ── Switch to app view & show Home panel ────────
+                    document.getElementById('auth-view').classList.add('hidden');
+                    document.getElementById('app-view').classList.remove('hidden');
+                    switchPanel('home');
+
+                    // ── Personalised greeting ────────────────────────
+                    const name = userData.displayName || userData.email?.split('@')[0] || 'Star';
+                    document.getElementById('home-greeting').textContent = `Welcome, ${name} ✦`;
+
+                    // ── Populate nav profile ─────────────────────────
+                    renderSidebarProfile(userData);
+
+                    // ── Show admin button if admin ───────────────────
+                    document.getElementById('btn-admin-panel').style.display =
+                        userData.role === 'admin' ? 'flex' : 'none';
+
+                    // ── Init modules (each wrapped so one failure
+                    //    doesn't block the others) ───────────────────
+                    try { chatUnsubscribe = initChat(user, userData); }
+                    catch (e) { console.error('[initChat]', e); }
+
+                    try { typingUnsubscribe = initTypingIndicator(user, userData); }
+                    catch (e) { console.error('[initTyping]', e); }
+
+                    try { membersUnsubscribe = initMembers(user, userData); }
+                    catch (e) { console.error('[initMembers]', e); }
+
+                    try { initProfile(user, userData); }
+                    catch (e) { console.error('[initProfile]', e); }
+
+                    try { initAdmin(user, userData); }
+                    catch (e) { console.error('[initAdmin]', e); }
+
+                    // ── Load settings ────────────────────────────────
+                    const rr = document.getElementById('toggle-read-receipts');
+                    const ti = document.getElementById('toggle-typing');
+                    if (rr) rr.checked = userData.settings?.readReceipts !== false;
+                    if (ti) ti.checked = userData.settings?.typingIndicator !== false;
+
+                    console.log('[auth] Logged in as', user.email, '— role:', userData.role);
+                } catch (err) {
+                    console.error('[onLogin] Unexpected error:', err);
+                    showToast('Login error: ' + err.message, 'error', 6000);
+                }
+            },
+            () => {
+                // In demo mode we stay on the app view
+                if (window.__DEMO_MODE) {
+                    console.log('[auth] Demo mode active — skipping auth redirect.');
+                    return;
+                }
+                // Switch to auth view
+                document.getElementById('auth-view').classList.remove('hidden');
+                document.getElementById('app-view').classList.add('hidden');
+                if (chatUnsubscribe) { chatUnsubscribe(); chatUnsubscribe = null; }
+                if (membersUnsubscribe) { membersUnsubscribe(); membersUnsubscribe = null; }
+                if (typingUnsubscribe) { typingUnsubscribe(); typingUnsubscribe = null; }
+
+                console.log('[auth] Logged out — showing auth view.');
+            }
+        );
+
+        // ── Sidebar profile render ────────────────────────────────
+        function renderSidebarProfile(userData) {
+            const avEl = document.getElementById('my-avatar-sidebar');
+            avEl.replaceWith(makeAvatarEl(userData, 'sm'));
+            const newAv = document.querySelector('#my-profile-row .avatar');
+            newAv.id = 'my-avatar-sidebar';
+            document.getElementById('my-name-sidebar').textContent = userData.displayName || userData.email;
+            const badge = document.getElementById('my-role-badge');
+            badge.textContent = userData.role;
+            badge.className = `role-badge ${userData.role}`;
+        }
+
+        // ── Profile button ────────────────────────────────────────
+        document.getElementById('btn-open-profile').addEventListener('click', () => {
+            renderMyProfile();
+            openModal('profile-modal');
+        });
+
+        // ── Settings save ─────────────────────────────────────────
+        document.getElementById('btn-save-settings').addEventListener('click', async () => {
+            const { db } = await import('./config.js');
+            const { doc, updateDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+            const user = getCurrentUser();
+            if (!user) return;
+            const rr = document.getElementById('toggle-read-receipts').checked;
+            const ti = document.getElementById('toggle-typing').checked;
+            await updateDoc(doc(db, 'users', user.uid), {
+                'settings.readReceipts': rr,
+                'settings.typingIndicator': ti
+            });
+            showToast('Settings saved ✓', 'success');
+            closeModal('settings-modal');
+        });
+
+        // ── Admin panel open ──────────────────────────────────────
+        document.getElementById('btn-admin-panel').addEventListener('click', () => {
+            renderAdminPanel();
+        });
+
+        // ── Sidebar toggle ────────────────────────────────────────
+        window.toggleSidebar = function (open) {
+            document.getElementById('sidebar').classList.toggle('open', open);
+        };
+
+        // ── Message input — auto-grow & typing ───────────────────
+        const msgInput = document.getElementById('msg-input');
+        msgInput.addEventListener('input', () => {
+            msgInput.style.height = 'auto';
+            msgInput.style.height = msgInput.scrollHeight + 'px';
+            const user = getCurrentUser();
+            if (user) setTyping(user.uid, msgInput.value.length > 0);
+        });
+        msgInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doSend(); }
+        });
+        document.getElementById('btn-send').addEventListener('click', doSend);
+
+        async function doSend() {
+            const text = msgInput.value.trim();
+            const user = getCurrentUser();
+            if (!user) return;
+            if (pendingMediaFile) {
+                const mode = document.getElementById('media-view-mode').value;
+                const btn = document.getElementById('btn-send');
+                btn.disabled = true; btn.textContent = '⏳';
+                try {
+                    await sendMediaMessage(pendingMediaFile, mode, text);
+                    clearMediaCompose();
+                } catch (e) { showToast('Upload failed: ' + e.message, 'error'); }
+                btn.disabled = false; btn.textContent = '▶';
+            } else if (text) {
+                await sendMessage(text);
+                msgInput.value = ''; msgInput.style.height = 'auto';
+                clearTyping(user.uid);
+            }
+        }
+
+        // ── Media attach ──────────────────────────────────────────
+        let pendingMediaFile = null;
+        document.getElementById('media-file-input').addEventListener('change', e => {
+            const file = e.target.files[0];
+            if (!file) return;
+            pendingMediaFile = file;
+            document.getElementById('media-compose-filename').textContent = file.name;
+            document.getElementById('media-compose-preview').classList.remove('hidden');
+            e.target.value = '';
+        });
+        window.clearMediaCompose = function () {
+            pendingMediaFile = null;
+            document.getElementById('media-compose-preview').classList.add('hidden');
+            document.getElementById('media-compose-filename').textContent = '';
+        };
+
+        // ── Reply ──────────────────────────────────────────────────
+        window.clearReply = function () {
+            setReplyTarget(null);
+            document.getElementById('reply-preview').classList.add('hidden');
+        };
+
+        // ── Members count header ──────────────────────────────────
+        window.updateMembersCount = function (count) {
+            document.getElementById('header-members-count').textContent = `${count} member${count !== 1 ? 's' : ''}`;
+        };
+
+        // ── View other user profile ───────────────────────────────
+        window.viewUserProfile = function (uid) {
+            renderViewProfile(uid);
+            openModal('view-profile-modal');
+        };
+
+        // ── Global message action handlers ───────────────────────
+        window.deleteMsg = deleteMessage;
+        window.reactMsg = reactToMessage;
+        window.replyMsg = function (msgId, senderName, text) {
+            setReplyTarget({ msgId, senderName, text });
+            document.getElementById('reply-preview').classList.remove('hidden');
+            document.getElementById('reply-preview-sender').textContent = senderName;
+            document.getElementById('reply-preview-text').textContent = text.slice(0, 60) + (text.length > 60 ? '…' : '');
+            msgInput.focus();
+        };
+        window.openMedia = showMediaViewer;
+    </script>
+
+
+</body>
+
+</html>
